@@ -62,4 +62,25 @@ public class PedidoRepository : IPedidoRepository
     {
         await _context.SaveChangesAsync();
     }
+
+    public async Task UpdatePedidoItensAsync(Guid pedidoId, List<ItemPedido> novoItens)
+    {
+        // Remover itens antigos
+        var itensAntigos = await _context.ItensPedidos
+            .Where(i => i.PedidoId == pedidoId)
+            .ToListAsync();
+
+        foreach (var item in itensAntigos)
+        {
+            _context.ItensPedidos.Remove(item);
+        }
+
+        // Adicionar novos itens
+        foreach (var novoItem in novoItens)
+        {
+            await _context.ItensPedidos.AddAsync(novoItem);
+        }
+
+        await _context.SaveChangesAsync();
+    }
 }

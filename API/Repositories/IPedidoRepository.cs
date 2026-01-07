@@ -41,4 +41,9 @@ public interface IPedidoRepository
     /// Salvar mudanças no banco de dados
     /// </summary>
     Task SaveChangesAsync();
+
+    /// <summary>
+    /// Atualizar itens de um pedido
+    /// </summary>
+    Task UpdatePedidoItensAsync(Guid pedidoId, List<ItemPedido> novoItens);
 }

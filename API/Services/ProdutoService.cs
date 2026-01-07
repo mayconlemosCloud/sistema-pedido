@@ -37,20 +37,11 @@ public class ProdutoService
     }
 
     /// <summary>
-    /// Criar um novo produto com validações
+    /// <summary>
+    /// Criar um novo produto
     /// </summary>
     public async Task<Guid> CreateProdutoAsync(string nome, string descricao, decimal preco, int quantidadeEstoque)
     {
-        // Validações básicas
-        if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome do produto é obrigatório", nameof(nome));
-
-        if (preco <= 0)
-            throw new ArgumentException("Preço deve ser maior que zero", nameof(preco));
-
-        if (quantidadeEstoque < 0)
-            throw new ArgumentException("Quantidade em estoque não pode ser negativa", nameof(quantidadeEstoque));
-
         var produto = new Produto
         {
             Id = Guid.NewGuid(),
@@ -77,12 +68,6 @@ public class ProdutoService
         var produto = await _repository.GetByIdAsync(id);
         if (produto == null)
             throw new KeyNotFoundException($"Produto com ID {id} não encontrado");
-
-        if (string.IsNullOrWhiteSpace(nome))
-            throw new ArgumentException("Nome do produto é obrigatório", nameof(nome));
-
-        if (preco <= 0)
-            throw new ArgumentException("Preço deve ser maior que zero", nameof(preco));
 
         produto.Nome = nome;
         produto.Descricao = descricao;

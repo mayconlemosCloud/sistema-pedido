@@ -2,8 +2,14 @@ using API.Data;
 using API.Repositories;
 using API.Services;
 using API.Events;
+using API.Mappings;
+using API.Validators.Produto;
+using API.Validators.Pedido;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +38,12 @@ builder.Services.AddScoped<PedidoService>();
 // Registrar Event Publisher
 builder.Services.AddSingleton<EventPublisher>();
 
+// Registrar AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 // Add services to the container.
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProdutoRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
@@ -42,6 +53,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
+
+// Auto-aplicar migrations ao iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
 }
 
 app.UseHttpsRedirection();

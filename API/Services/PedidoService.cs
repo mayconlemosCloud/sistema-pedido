@@ -55,17 +55,11 @@ public class PedidoService
     }
 
     /// <summary>
-    /// Criar um novo pedido com validações
+    /// <summary>
+    /// Criar um novo pedido com validações de negócio
     /// </summary>
     public async Task<Guid> CreatePedidoAsync(Guid clienteId, List<(Guid ProdutoId, int Quantidade)> itens)
     {
-        // Validações básicas
-        if (clienteId == Guid.Empty)
-            throw new ArgumentException("ClienteId é obrigatório", nameof(clienteId));
-
-        if (itens == null || itens.Count == 0)
-            throw new ArgumentException("Pedido deve ter pelo menos um item", nameof(itens));
-
         // Criar o pedido
         var pedido = new Pedido
         {
@@ -85,9 +79,7 @@ public class PedidoService
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {produtoId} não encontrado");
 
-            if (quantidade <= 0)
-                throw new ArgumentException($"Quantidade deve ser maior que zero para o produto {produtoId}", nameof(quantidade));
-
+            // Validação de negócio: estoque suficiente
             if (produto.QuantidadeEstoque < quantidade)
                 throw new InvalidOperationException($"Estoque insuficiente para o produto {produto.Nome}. Disponível: {produto.QuantidadeEstoque}, Solicitado: {quantidade}");
 
@@ -134,5 +126,53 @@ public class PedidoService
         _logger.LogInformation("Pedido criado com sucesso. ID: {PedidoId}", pedido.Id);
 
         return pedido.Id;
+    }
+
+    public async Task<Pedido?> UpdatePedidoAsync(Guid pedidoId, string status, List<(Guid ProdutoId, int Quantidade)> itens)
+    {
+        var pedido = await _pedidoRepository.GetByIdAsync(pedidoId);
+        if (pedido == null)
+            return null;
+
+        _logger.LogInformation("Atualizando pedido {PedidoId}", pedidoId);
+
+        pedido.Status = status.ToUpper();
+
+        if (itens != null && itens.Count > 0)
+        {
+            decimal valorTotal = 0;
+
+            // Validar e montar novos itens
+            var novoItens = new List<ItemPedido>();
+            foreach (var (produtoId, quantidade) in itens)
+            {
+                var produto = await _produtoRepository.GetByIdAsync(produtoId);
+                if (produto == null)
+                    throw new KeyNotFoundException($"Produto com ID {produtoId} não encontrado");
+
+                var novoItem = new ItemPedido
+                {
+                    Id = Guid.NewGuid(),
+                    PedidoId = pedido.Id,
+                    ProdutoId = produtoId,
+                    Quantidade = quantidade,
+                    PrecoUnitario = produto.Preco,
+                    PrecoTotal = produto.Preco * quantidade
+                };
+
+                novoItens.Add(novoItem);
+                valorTotal += novoItem.PrecoTotal;
+            }
+
+            // Atualizar itens no banco
+            await _pedidoRepository.UpdatePedidoItensAsync(pedidoId, novoItens);
+            pedido.Itens = novoItens;
+            pedido.ValorTotal = valorTotal;
+        }
+
+        await _pedidoRepository.UpdateAsync(pedido);
+        await _pedidoRepository.SaveChangesAsync();
+
+        return pedido;
     }
 }
