@@ -1,0 +1,38 @@
+# Binaries and executables
+*.dll
+*.exe
+*.pdb
+
+# Build results
+bin/
+obj/
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.userprefs
+*.suo
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
