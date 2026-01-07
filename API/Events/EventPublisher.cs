@@ -6,7 +6,7 @@ namespace API.Events;
 /// Publicador de eventos (mock simples)
 /// Simula a publicação de eventos como se fosse Kafka/RabbitMQ
 /// </summary>
-public class EventPublisher
+public class EventPublisher : IEventPublisher
 {
     private readonly ILogger<EventPublisher> _logger;
 

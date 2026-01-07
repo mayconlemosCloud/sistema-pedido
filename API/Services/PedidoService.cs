@@ -12,13 +12,13 @@ public class PedidoService
 {
     private readonly IPedidoRepository _pedidoRepository;
     private readonly IProdutoRepository _produtoRepository;
-    private readonly EventPublisher _eventPublisher;
+    private readonly IEventPublisher _eventPublisher;
     private readonly ILogger<PedidoService> _logger;
 
     public PedidoService(
         IPedidoRepository pedidoRepository,
         IProdutoRepository produtoRepository,
-        EventPublisher eventPublisher,
+        IEventPublisher eventPublisher,
         ILogger<PedidoService> logger)
     {
         _pedidoRepository = pedidoRepository;

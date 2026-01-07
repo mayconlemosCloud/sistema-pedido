@@ -36,7 +36,7 @@ builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<PedidoService>();
 
 // Registrar Event Publisher
-builder.Services.AddSingleton<EventPublisher>();
+builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
 
 // Registrar AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
