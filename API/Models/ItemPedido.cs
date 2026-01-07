@@ -35,7 +35,7 @@ public class ItemPedido
     /// </summary>
     public decimal PrecoTotal { get; set; }
 
-    // Referências de navegação
+
     public Pedido? Pedido { get; set; }
     public Produto? Produto { get; set; }
 }
