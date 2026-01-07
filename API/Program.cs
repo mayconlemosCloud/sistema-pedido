@@ -1,4 +1,7 @@
 using API.Data;
+using API.Repositories;
+using API.Services;
+using API.Events;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +20,17 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString)
 );
+
+// Registrar Repositories
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+
+// Registrar Services
+builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<PedidoService>();
+
+// Registrar Event Publisher
+builder.Services.AddSingleton<EventPublisher>();
 
 // Add services to the container.
 builder.Services.AddOpenApi();
